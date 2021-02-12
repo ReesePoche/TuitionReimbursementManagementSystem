@@ -28,15 +28,15 @@ List of features ready and TODOs for future development
 
 ## Getting Started
    
-> Clone the repository with git command: git clone https://github.com/ReesePoche/TuitionReimbursementManagementSystem.git
-> In an Oracle Database, run the SQL script named project1 from the SQL directory in the project.
-> Change password and location of database you will use in the JDBCConnection class located in src/main/java/dev/reese/project1/util/
-> Install and setup an Apache Tomcat server version 8.5.
-> Ensure all dependencies located in the projects Pom.xml are downloaded
-> Run the project on the setup Tomcat Server
-> In a browser on the same machine the server is running type in the url: http://localhost:8080/dev.reese.project1/LoginPage.goto
-> You should be at the login page. 
-> Check Oracle Database for some valid login credential with command:  select * from employees;
+1. Clone the repository with git command: git clone https://github.com/ReesePoche/TuitionReimbursementManagementSystem.git
+1. In an Oracle Database, run the SQL script named project1 from the SQL directory in the project.
+1. Change password and location of database you will use in the JDBCConnection class located in src/main/java/dev/reese/project1/util/
+1. Install and setup an Apache Tomcat server version 8.5.
+1. Ensure all dependencies located in the projects Pom.xml are downloaded
+1. Run the project on the setup Tomcat Server
+1. In a browser on the same machine the server is running type in the url: http://localhost:8080/dev.reese.project1/LoginPage.goto
+1. You should be at the login page. 
+1. Check Oracle Database for some valid login credential with command:  select * from employees;
 
 
 
