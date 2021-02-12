@@ -28,8 +28,6 @@ List of features ready and TODOs for future development
 
 ## Getting Started
    
-(include git clone command)
-(include all environment setup steps)
 > Clone the repository with git command: git clone https://github.com/ReesePoche/TuitionReimbursementManagementSystem.git
 > In an Oracle Database, run the SQL script named project1 from the SQL directory in the project.
 > Change password and location of database you will use in the JDBCConnection class located in src/main/java/dev/reese/project1/util/
@@ -41,7 +39,7 @@ List of features ready and TODOs for future development
 > Check Oracle Database for some valid login credential with command:  select * from employees;
 
 
-## Usage
+
 
 
 
