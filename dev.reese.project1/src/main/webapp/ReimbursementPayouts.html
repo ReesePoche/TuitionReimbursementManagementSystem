@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+<title>Payouts Page</title>
+</head>
+<body>
+    <div class="container">
+		<div class="row align-items-start">
+		  <div class="col">
+			<h1>CompanyName</h1>
+		  </div>
+		  <div class="col">
+			<h1>Payouts</h1>
+		  </div>
+		  <div class="col">
+			<h4 id="employeeName">Hello! </h4>
+			<button type="button" class="btn btn-secondary btn-sm" id="loginbtn" onclick="logOut()">Logout</button>
+		  </div>
+		</div>
+    </div>
+
+    <div class="container" id="breadCumbHeadDiv">
+		<div class="col"> </div>
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item"><a href="http://localhost:8080/dev.reese.project1/TRMSHub.goto">TRMS Hub</a></li>
+			<li class="breadcrumb-item active" aria-current="page">Payouts</li>
+			</ol>
+		</nav>
+    </div>
+	<div class="p-4 mb-3 bg-secondary text-white"> </div>
+	<div class="container" id="Body">
+		<div class="col"> </div>
+		<div class="p-3 mb-2 bg-dark text-white">
+			<h6 id="tableHeader">Pending Payouts</h6>
+			<table class="table table-dark table-hover" id="pendingPayoutsTable">
+				<tr>
+					<th>Payout#</th>
+					<th>For Request#</th>
+					<th>Amount</th>
+                    <th>Year</th>
+                    <th>waiting on</th>
+					<th>Notes</th>
+				</tr>
+				
+
+
+
+
+
+
+
+
+
+			</table>
+		</div>
+		<div class="p-3 mb-2 bg-dark text-white">
+			<h6>Rewarded Payouts:</h6>
+			<table class="table table-dark table-hover" id="rewardedPayoutsTable">
+				<tr>
+					<th>Payout#</th>
+					<th>Request#</th>
+					<th>Amount</th>
+                    <th>Year</th>
+                    <th>Rewarded At</th>
+					<th>Notes</th>
+				</tr>
+			</table>
+		</div>
+		
+
+
+
+
+
+
+
+
+		
+		
+	</div>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+<script>
+	var employee;
+	var payouts = [];
+	var pendingPayouts = [];
+	var rewardedPayouts = [];
+	var totalPayoutsThisYear;
+	getPageInfo();
+
+	function getPageInfo(){
+			let xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+				if(this.readyState == 4 && this.status == 200) {
+					console.log(this.responseText);
+					let tempjson = JSON.parse(this.responseText);
+					console.log(tempjson);
+					employee = tempjson[0];
+					payouts = tempjson[1];
+					totalPayoutsThisYear = tempjson[2];
+					console.log(employee);
+					console.log(payouts);
+					setUpPage();
+				}
+			}
+			xhttp.open("GET", "http://localhost:8080/dev.reese.project1/Payouts.pageinfo", true);
+			xhttp.setRequestHeader('Content-Type','application/json');
+			xhttp.send();
+	}
+
+	function setUpPage(){
+		let asdf = document.getElementById("employeeName");
+		asdf.innerHTML = "Hello " + employee.firstName;
+		if(payouts.length == 0){
+			let tempTable = document.getElementById("pendingPayoutsTable");
+			let row = tempTable.insertRow(1);
+			let cell1 = row.insertCell(0);
+			cell1.innerHTML = "You Currently have no pending Payouts";
+			tempTable = document.getElementById("rewardedPayoutsTable");
+			row = tempTable.insertRow(1);
+			cell1 = row.insertCell(0);
+			cell1.innerHTML = "You Currently have no rewarded Payouts";
+		}
+		else {
+			sortPayouts();
+			addPendingPayoutsToTable();
+			addAwardedPayoutsToTable();
+		}
+			
+	}
+
+	function sortPayouts(){
+		if (payouts === []){
+			return;
+		}
+		else {
+			for(var i = 0; i < payouts.length; i++){
+				if(payouts[i].status == "AWARDED"){
+					rewardedPayouts.push(payouts[i]);
+				}
+				else{
+					pendingPayouts.push(payouts[i]);
+				}
+			}
+		}
+	}
+
+	function addPendingPayoutsToTable(){
+		let tempTable = document.getElementById("pendingPayoutsTable");
+		let rowCount = 1;
+		if(pendingPayouts.length > 0){
+			for(i = 0; i < pendingPayouts.length; i=i+1){
+				let row = tempTable.insertRow(rowCount);
+				let cell0 = row.insertCell(0);
+				let cell1 = row.insertCell(1);
+				let cell2 = row.insertCell(2);
+				let cell3 = row.insertCell(3);
+				let cell4 = row.insertCell(4);
+				let cell5 = row.insertCell(5);
+				cell0.innerHTML = pendingPayouts[i].id;
+				cell1.innerHTML = pendingPayouts[i].requestId;
+				cell2.innerHTML = "$" + pendingPayouts[i].amount;
+				cell3.innerHTML = pendingPayouts[i].forYear;
+				cell4.innerHTML = pendingPayouts[i].dateOfPayment;
+				cell5.innerHTML = pendingPayouts[i].notes;
+			}
+		}
+		else {
+			let row = tempTable.insertRow(1);
+			let cell1 = row.insertCell(0);
+			cell1.innerHTML = "You Currently have no pending Payouts";
+		}
+	}
+
+	function addAwardedPayoutsToTable(){
+		let tempTable = document.getElementById("rewardedPayoutsTable");
+		let rowCount = 1;
+		if(pendingPayouts.length > 0){
+			for(i = 0; i < pendingPayouts.length; i=i+1){
+				let row = tempTable.insertRow(rowCount);
+				let cell0 = row.insertCell(0);
+				let cell1 = row.insertCell(1);
+				let cell2 = row.insertCell(2);
+				let cell3 = row.insertCell(3);
+				let cell4 = row.insertCell(4);
+				let cell5 = row.insertCell(5);
+				cell0.innerHTML = pendingPayouts[i].id;
+				cell1.innerHTML = pendingPayouts[i].requestId;
+				cell2.innerHTML = "$" + pendingPayouts[i].amount;
+				cell3.innerHTML = pendingPayouts[i].forYear;
+				cell4.innerHTML = statusToWaitingOn(pendingPayouts[i].status);
+				cell5.innerHTML = pendingPayouts[i].notes;
+			}
+		}
+		else {
+			let row = tempTable.insertRow(1);
+			let cell1 = row.insertCell(0);
+			cell1.innerHTML = "You Currently have no awarded Payouts";
+		}
+	}
+
+
+
+	function statusToWaitingOn(statusString){
+		if(statusString == "PEA"){
+			return "Employee approval Of Amount"
+		}
+		if(statusString == "PG"){
+			return "Grading Process"
+		}
+		
+
+	}
+
+
+
+		
+
+
+
+
+
+
+
+</script>
+
+
+</body>
+
+<script>
+    function logOut() {
+		window.location.replace("http://localhost:8080/dev.reese.project1/LoginPage.goto");
+	}
+
+</script>
+</html>

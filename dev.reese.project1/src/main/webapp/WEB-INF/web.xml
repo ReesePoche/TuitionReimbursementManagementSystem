@@ -1,0 +1,67 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+  <display-name>Archetype Created Web Application</display-name>
+  <servlet>
+  	<servlet-name>MainServlet</servlet-name>
+  	<display-name>MainServlet</display-name>
+  	<description></description>
+  	<servlet-class>servlets.MainServlet</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>LoginServlet</servlet-name>
+  	<display-name>LoginServlet</display-name>
+  	<description></description>
+  	<servlet-class>servlets.LoginServlet</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>GoToServlet</servlet-name>
+  	<display-name>GoToServlet</display-name>
+  	<description></description>
+  	<servlet-class>servlets.GoToServlet</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>SetUpServlet</servlet-name>
+  	<display-name>SetUpServlet</display-name>
+  	<description></description>
+  	<servlet-class>servlets.SetUpServlet</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>PageInfoServlet</servlet-name>
+  	<display-name>PageInfoServlet</display-name>
+  	<description></description>
+  	<servlet-class>servlets.PageInfoServlet</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>DoServlet</servlet-name>
+  	<display-name>DoServlet</display-name>
+  	<description></description>
+  	<servlet-class>servlets.DoServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+  	<servlet-name>MainServlet</servlet-name>
+  	<url-pattern>/MainServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>LoginServlet</servlet-name>
+  	<url-pattern>/LoginServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>GoToServlet</servlet-name>
+  	<url-pattern>*.goto</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>SetUpServlet</servlet-name>
+  	<url-pattern>*.setup</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>PageInfoServlet</servlet-name>
+  	<url-pattern>*.pageinfo</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>DoServlet</servlet-name>
+  	<url-pattern>*.do</url-pattern>
+  </servlet-mapping>
+</web-app>

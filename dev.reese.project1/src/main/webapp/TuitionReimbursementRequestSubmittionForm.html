@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+<title>TRR Submittion Form</title>
+</head>
+<body>
+    <div class="container">
+		<div class="row align-items-start">
+		  <div class="col">
+			<h1>CompanyName</h1>
+		  </div>
+		  <div class="col">
+			<h1>TR Submittion Form</h1>
+		  </div>
+		  <div class="col">
+			<h4 id="employeeName">Hello! </h4>
+			<button type="button" class="btn btn-secondary btn-sm" id="loginbtn" onclick="logOut()">Logout</button>
+		  </div>
+		</div>
+    </div>
+
+    <div class="container" id="breadCumbHeadDiv">
+		<div class="col"> </div>
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item"><a href="http://localhost:8080/dev.reese.project1/TRMSHub.goto">TRMS Hub</a></li>
+			<li class="breadcrumb-item active" aria-current="page">Request Submittion</li>
+			</ol>
+		</nav>
+    </div>
+    <div class="p-4 mb-3 bg-secondary text-white"> </div>
+    <div class="container bg-dark text-white p-4 mb-3 " id="bodyContainer">
+        <div class="col"> </div>
+        <div class="form-horizontal pb-2">
+            <select class="form-select" aria-label="Default select example" id="eventType">
+                <option selected>Type Of Event</option>
+                <option value="UC">University Course</option>
+                <option value="S">Seminars</option>
+                <option value="C">Certification</option>
+                <option value="CPC">Certification Prep Class</option>
+                <option value="TT">Technical Training</option>
+                <option value="O">Other</option>
+            </select>
+        </div>
+        <div class="form-group m-2">
+            <label for="description">Describe What the Event is</label>
+            <textarea class="form-control" id="description" rows="3"></textarea>
+        </div>
+        <div class="form-group m-2">
+            <label for="wordJustification">How Does it Relate to your work?</label>
+            <textarea class="form-control" id="wordJustification" rows="3"></textarea>
+        </div>
+        <div class="form-group m-2">
+            <label for="datetime-local">Date and time of event: </label>
+            <input type="datetime-local" id="datetimeOfEvent">
+        </div>
+        <div class="form-group m-2">
+            <label for="location">Full Address of Event</label>
+            <textarea class="form-control" id="location" rows="3"></textarea>
+        </div>
+        <div class="form-group m-2">
+            <label for="number">Total Cost of Event</label>
+            <input type="number" min="0.00" max="10000.00" step="0.01" value="0.00" id="tcost"/>
+        </div>
+        <div class="form-group m-2">
+            <label for="gradeFormat">Grade format Of event</label>
+            <select class="form-select" aria-label="Default select example" id="gradeFormat">
+                <option selected>Grading Format</option>
+                <option value="0">Score Out of 100</option>
+                <option value="1">Pass/Fail</option>
+                <option value="2">None (A presentation will be given)</option>
+            </select>
+        </div>
+        <div class="form-group m-2">
+            <label for="scoreRequired">Score Required    (if Pass/Fail or None Leave Score Required Blank)</label>
+            <input type="number" min="0" max="100" step="1" value="70" id="scoreRequired" />
+        </div>
+        <div class="form-group m-2">
+            <label for="number">Hours Of Work that will be missed (not required but supervisor can require it before approval)</label>
+            <input type="number" min="0.00" max="10000.00" step="0.25" value="0.00" id="hoursOfWork" />
+        </div>
+        <div class="form-group m-2">
+            <label for="attachment">Attachment related To event(does not work in beta)</label>
+            <input type="file" class="form-control-file" id="attachment">
+        </div>
+
+
+
+
+        <div class="form-group m-2">
+            <button type="button" class="btn btn-primary btn-lg ms-5" onclick="AttemptSubmit()">Submit Request</button>
+        </div>
+
+        
+       
+
+
+
+    </div>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+
+
+
+    <script>
+
+
+        var employee;
+		getPageInfo();
+
+		function getPageInfo(){
+			let xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+				if(this.readyState == 4 && this.status == 200) {
+					employee = JSON.parse(this.responseText);
+					console.log(this.responseText);
+					console.log(employee);
+					setUpPage();
+				}
+			}	
+			xhttp.open("GET", "http://localhost:8080/dev.reese.project1/Hubinfo.pageinfo", true);
+			xhttp.setRequestHeader('Content-Type','application/json');
+			xhttp.send();
+		}
+
+		function setUpPage(){
+			let asdf = document.getElementById("employeeName");
+			asdf.innerHTML = "Hello " + employee.firstName;
+		}
+
+
+
+
+
+
+
+        function AttemptSubmit(){
+            let typeOfEvent = document.getElementById("eventType").value;
+            let description = document.getElementById("description").value;
+            let workJustification = document.getElementById("wordJustification").value;
+            let dateTimeOfEvent = document.getElementById("datetimeOfEvent").value;
+            let location = document.getElementById("location").value;
+            let cost = document.getElementById("tcost").value;
+            let gradeFormat = document.getElementById("gradeFormat").value;
+            let scoreNeeded = document.getElementById("scoreRequired").value;
+            let HoursOfWork = document.getElementById("hoursOfWork").value;
+            console.log(typeOfEvent);
+            console.log(description);
+            console.log(workJustification);
+            console.log(dateTimeOfEvent);
+            console.log(location);
+            console.log(cost);
+            console.log(gradeFormat);
+            console.log(scoreNeeded);
+            console.log(HoursOfWork);
+            if(typeof(typeOfEvent) == "undefined" || typeOfEvent == "Type Of Event" ){
+                alert("Event Type Not filled");
+                return;
+            }
+            if(typeof(description) == "undefined" || description == ""){
+                alert("description field Not filled");
+                return;
+            }
+            if(typeof(workJustification) == "undefined" || workJustification == ""){
+                alert("work Justification feild Not filled");
+                return;
+            }
+            if(typeof(dateTimeOfEvent) == "undefined" ){
+                alert("date and time of event Not filled");
+                return;
+            }
+            if(typeof(location) == "undefined" || location == ""){
+                alert("Event Type Not filled");
+                return;
+            }
+            if(typeof(cost) == "undefined" || cost == 0 ){
+                alert("Cost of event Not filled");
+                return;
+            }
+            if(typeof(gradeFormat) == "undefined" ){
+                alert("Grade Format Not filled");
+                return;
+            }
+            if(gradeFormat==0 && (typeof(scoreNeeded) == "undefined" || scoreNeeded == 0)){
+                alert("Score required need to be filled");
+                return;
+            }
+           //Time check go here if needed
+           let filledOutForm = {
+                typeOfEvent: document.getElementById("eventType").value,
+                description:  document.getElementById("description").value,
+                workJustification:  document.getElementById("wordJustification").value,
+                dateTimeOfEvent: document.getElementById("datetimeOfEvent").value,
+                location: document.getElementById("location").value,
+                cost: document.getElementById("tcost").value,
+                gradeFormat: document.getElementById("gradeFormat").value,
+                scoreNeeded: document.getElementById("scoreRequired").value,
+                HoursOfWork: document.getElementById("hoursOfWork").value
+           };
+			let xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+				if(this.readyState == 4 && this.status == 200) {
+                    console.log(this.responseText);
+                    if(this.responseText == "SS"){
+                        window.location.replace("http://localhost:8080/dev.reese.project1/TRMSHub.goto");
+                    }
+                    else{
+                        alert("Submittion did not go through")
+                    }
+				}
+			}	
+			xhttp.open("Post", "http://localhost:8080/dev.reese.project1/SubmitForm.do", true);
+			xhttp.setRequestHeader('Content-Type','application/json');
+			xhttp.send(JSON.stringify(filledOutForm));
+        }
+        
+       
+
+        
+
+
+
+    </script>
+</body>
+
+<script>
+    function logOut() {
+		window.location.replace("http://localhost:8080/dev.reese.project1/LoginPage.goto");
+    }
+
+</script>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+
+<title>Tuition Reimbursement Request Form</title>
+</head>
+<body>
+    <div class="container">
+        
+        
+            <div class="col"> </div>
+            
+            
+            
+            <div class="form-horizontal pb-2">
+                
+            </div>
+            <
+                    </div>
+                    <div class="col">
+                        <label for="exampleFormControlTextarea1">Score Required (if Pass/Fail or None Leave Blank)</label>
+                        <input type="number" min="0" max="100" step="1" value="70" />
+                    </div>
+                </div>
+            </div>
+            
+            
+            
+            
+            <button type="button" class="btn btn-primary btn-lg ms-5">Submit</button>
+        </div>
+
+    </div>
+            
+    
+
+        
+   
+
+
+
+    
+
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+</body>
+</html>
+-->

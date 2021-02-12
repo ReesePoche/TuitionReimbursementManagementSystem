@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="ISO-8859-1">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+        <title>Request Viewer</title>
+    </head>
+<body>
+    <div class="container">
+		<div class="row align-items-start">
+		  <div class="col">
+			<h1>CompanyName</h1>
+		  </div>
+		  <div class="col">
+			<h1>Request Viewer</h1>
+		  </div>
+		  <div class="col">
+			<h4 id="employeeName">Hello! </h4>
+			<button type="button" class="btn btn-secondary btn-sm" id="loginbtn" onclick="logOut()">Logout</button>
+		  </div>
+		</div>
+    </div>
+
+    <div class="container" id="breadCumbHeadDiv">
+		<div class="col"> </div>
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item"><a href="http://localhost:8080/dev.reese.project1/TRMSHub.goto">TRMS Hub</a></li>
+            <li class="breadcrumb-item"><a href="http://localhost:8080/dev.reese.project1/Requests.goto">Submitted Requests</a></li>
+			<li class="breadcrumb-item active" aria-current="page">Request Viewer</li>
+			</ol>
+		</nav>
+    </div>
+
+    <div class="p-4 mb-3 bg-secondary text-white"> </div>
+	<div class="container" id="Body">
+		<div class="col"> </div>
+		<div class="p-3 mb-2 bg-dark text-white">
+			<h6 id="tableHeader"></h6>
+			<table class="table table-dark table-hover" id="requestTable">
+                <tr>
+					<th>Status of Request</th>
+					<td id="requestStatus"></td>
+                </tr>
+                <tr>
+					<th>Type Of Event</th>
+					<td id="eventType"></td>
+                </tr>
+                <tr>
+					<th>Total Cost</th>
+					<td id="totalCost"></td>
+                </tr>
+                <tr>
+					<th>Description</th>
+					<td id="description"></td>
+                </tr>
+                <tr>
+					<th>Location</th>
+					<td id="location"></td>
+                </tr>
+                <tr>
+					<th>Start Of Event</th>
+					<td id="start"></td>
+                </tr>
+
+                <tr>
+					<th>Work Justificaiton</th>
+					<td id="justification"></td>
+                </tr>
+                <tr>
+					<th>Grade Format</th>
+					<td id="gradeFormat"></td>
+                </tr>
+                <tr>
+					<th>Required Score</th>
+					<td id="requiredScore"></td>
+                </tr>
+                <tr>
+					<th>Hours of Work that will be Missed</th>
+					<td id="hoursOfWorkMissed"></td>
+                </tr>
+                <tr>
+					<th>Request Submitted At</th>
+					<td id="submittedAt"></td>
+                </tr>
+                <tr>
+					<th>Supervisor Approvals</th>
+					<td id="SVApproval"></td>
+                </tr>
+                <tr>
+					<th>Department Head Approves</th>
+					<td id="DHApproval"></td>
+                </tr>
+                <tr>
+					<th>Benifits Coordinator Approval:</th>
+					<td id="BCA"></td>
+                </tr>
+                
+            </table>
+                <h6 id="notesTableHeader">Notes:</h6>
+                <table class="table table-dark table-hover" id="noteTable">
+                    
+                </table>
+            
+                <h6 id="GradeTableHeader">Grade:</h6>
+                <table class="table table-dark table-hover" id="gradeTable">
+                    
+                </table>
+             
+            
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+	<script>
+        var employee;
+        var request;
+        var notes;
+        var submittedGrade;
+        getPageInfo();
+
+		function getPageInfo(){
+			let xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+				if(this.readyState == 4 && this.status == 200) {
+					let tempjson = JSON.parse(this.responseText);
+                    console.log(tempjson);
+                    console.log(this.responseText);
+                    employee = tempjson[0];
+                    request = tempjson[1];
+                    notes = tempjson[2];
+                    submittedGrade = tempjson[3];
+                    console.log("employee:");
+                    console.log(employee);
+                    console.log("request:")
+                    console.log(request);
+                    console.log("notes:")
+                    console.log(notes);
+                    console.log("submittedGrade:")
+                    console.log(submittedGrade);
+                    setUpPage();
+				}
+			}
+			xhttp.open("GET", "http://localhost:8080/dev.reese.project1/RequestViewer.pageinfo", true);
+			xhttp.setRequestHeader('Content-Type','application/json');
+			xhttp.send();
+		}
+
+		function setUpPage(){
+			let asdf = document.getElementById("employeeName");
+			asdf.innerHTML = "Hello " + employee.firstName;
+            addRequestInfoToTable();
+            addNotesToNoteTable();
+            addGradeToGradeTable();
+        }
+        
+        function addRequestInfoToTable(){
+            let cr = document.getElementById("tableHeader");
+            cr.innerHTML = "Request # "+ request.id;
+            cr = document.getElementById("requestStatus");
+            cr.innerHTML = makeRequestStatusReadable(request.statusOfRequest);
+
+            cr = document.getElementById("eventType");
+            cr.innerHTML = makeEventTypeReadable(request.eventType);
+
+            cr = document.getElementById("totalCost");
+            cr.innerHTML = "$"+request.totalCost;
+
+            cr = document.getElementById("description");
+            cr.innerHTML = request.eventDescription;
+
+            cr = document.getElementById("location");
+            cr.innerHTML = request.eventLocation;
+
+            cr = document.getElementById("start");
+            cr.innerHTML = request.startDateTimeOfEvent;
+
+            cr = document.getElementById("justification");
+            cr.innerHTML = request.workRelatedJustification;
+            cr = document.getElementById("gradeFormat");
+            let gfvalue = request.gradeFormat;
+            if(gfvalue == 0) {
+                cr.innerHTML = "Test Score out of 100%";
+                cr = document.getElementById("requiredScore");
+                cr.innerHTML = request.scoreRequired + "%";
+            }
+            if(gfvalue == 1){
+                cr.innerHTML = "pass/fail result";
+                cr = document.getElementById("requiredScore");
+                cr.innerHTML = "A Pass";
+            }
+            if(gfvalue == 2){
+                cr.innerHTML = "A presentation";
+                cr = document.getElementById("requiredScore");
+                cr.innerHTML = "A satisfactory presentation as determined by your supervisor";
+            }
+            cr = document.getElementById("hoursOfWorkMissed");
+            cr.innerHTML = request.hoursOfWorkMissed;
+            cr = document.getElementById("submittedAt");
+            cr.innerHTML = request.dateSubmitted;
+            cr = document.getElementById("SVApproval");
+            cr.innerHTML = trueYesFalseNo(request.hasSupervisorApproval);
+            cr = document.getElementById("DHApproval");
+            cr.innerHTML = trueYesFalseNo(request.hasDepartmentHeadApproval);
+            cr = document.getElementById("BCA");
+            cr.innerHTML = trueYesFalseNo(request.hasBenCoApproval);
+        }
+
+        function addNotesToNoteTable(){
+            console.log("inside of adding notes");
+            let rowCount = 0;
+            let noteTable = document.getElementById("noteTable");
+            if(!(notes.length == 0)){
+                console.log("inside the condition to check if !notes == [] its ");
+                for (i = 0; i < notes.length; i++) {
+                    console.log("at the start of teh for loop");
+                    let row1 = noteTable.insertRow(rowCount);
+                    rowCount = rowCount + 1;
+                    let cell1 = row1.insertCell(0);
+                    let cell2 = row1.insertCell(1);
+                    cell1.innerHTML = "Note added by: "+ notes[i].posterName;
+                    cell2.innerHTML = "Added at: " + notes[i].addedAt;
+                    let row2 = noteTable.insertRow(rowCount);
+                    rowCount = rowCount + 1;
+                    let cell3 = row2.insertCell(0);
+                    cell3.innerHTML = "Subject: " + notes[i].subject;
+                    let row3 = noteTable.insertRow(rowCount);
+                    rowCount = rowCount + 1;
+                    let cell4 = row3.insertCell(0);
+                    let cell5 = row3.insertCell(1);
+                    cell4.innerHTML = "Note:";
+                    cell5.innerHTML = notes[i].note;
+			    }
+            }
+            else {
+                console.log("make it to the else of the add notes to table");
+                let row = noteTable.insertRow(rowCount);
+                let cell1 = row.insertCell(0);
+                cell1.innerHTML = "No notes attached to request";
+            }
+            //do add note to if wanted here
+            console.log("end of add notes method");
+        }
+
+        function addGradeToGradeTable(){
+            console.log("start of add grades to table");
+            let rowCount = 0;
+            let gradeTable = document.getElementById("gradeTable");
+            if(!(submittedGrade.length == 0)){
+                console.log("inside of the submittedgaade == [] thing wow much wow");
+                let row1 = gradeTable.insertRow(rowCount);
+                rowCount = rowCount + 1;
+                let cell1 = row1.insertCell(0);
+                let cell2 = row1.insertCell(1);
+                cell1.innerHTML = "Reported Score: ";
+                cell2.innerHTML = submittedGrade[0].employeeSelfReportedScore;
+                row1 = gradeTable.insertRow(rowCount);
+                rowCount = rowCount + 1;
+                cell1 = row1.insertCell(0);
+                cell2 = row1.insertCell(1);
+                cell1.innerHTML = "Submitted At: ";
+                cell2.innerHTML = submittedGrade[0].submittedAt;
+                row1 = gradeTable.insertRow(rowCount);
+                rowCount = rowCount + 1;
+                cell1 = row1.insertCell(0);
+                cell2 = row1.insertCell(1);
+                let reviewed = wasGradeReviewed();
+                cell1.innerHTML = "Reviewed yet: ";
+                if(reviewed){
+                    cell2.innerHTML = "Yes";
+                    row1 = gradeTable.insertRow(rowCount);
+                    rowCount = rowCount + 1;
+                    cell1 = row1.insertCell(0);
+                    cell2 = row1.insertCell(1);
+                    cell1.innerHTML = "Reviewed At: ";
+                    cell2.innerHTML = submittedGrade[0].reviewedAt;
+                    row1 = gradeTable.insertRow(rowCount);
+                    rowCount = rowCount + 1;
+                    cell1 = row1.insertCell(0);
+                    cell2 = row1.insertCell(1);
+                    cell1.innerHTML = "passed: ";
+                    cell2.innerHTML = trueYesFalseNo(submittedGrade[0].passed);
+                }
+                else {
+                    cell2.innerHTML = "No";
+                }
+                if(submittedGrade[1] === []){
+                    row1 = gradeTable.insertRow(rowCount);
+                    let cell1 = row.insertCell(0);
+                    cell1.innerHTML = "No notes attached to Grade";
+                }
+                else{
+                    row1 = gradeTable.insertRow(rowCount);
+                    rowCount = rowCount + 1;
+                    cell1 = row1.insertCell(0);
+                    cell1.innerHTML = "Notes attached to grade: ";
+                    for (i = 0; i < notes.length; i++) {
+                        row1 = gradeTable.insertRow(rowCount);
+                        rowCount = rowCount + 1;
+                        cell1 = row1.insertCell(0);
+                        cell1.innerHTML = "Note added At: "+ submittedGrade[1][i].addedAt;
+                        row1 = gradeTable.insertRow(rowCount);
+                        rowCount = rowCount + 1;
+                        cell1 = row1.insertCell(0);
+                        cell1.innerHTML = "Subject: " + submittedGrade[1][i].subject;
+                        row1 = gradeTable.insertRow(rowCount);
+                        rowCount = rowCount + 1;
+                        cell1 = row1.insertCell(0);
+                        cell2 = row1.insertCell(1);
+                        cell1.innerHTML = "Note:";
+                        cell2.innerHTML = submittedGrade[1][i].note;
+                    }
+                    //where to add add note if wanted. 
+                }
+
+
+                /////////////////////////////
+                
+                
+                
+                let row2 = gradeTable.insertRow(rowCount);
+                rowCount = rowCount + 1;
+                let cell3 = row2.insertCell(0);
+                cell3.innerHTML = "Subject: " + notes[i].subject;
+                let row3 = gradeTable.insertRow(rowCount);
+                rowCount = rowCount + 1;
+                let cell4 = row3.insertCell(0);
+                let cell5 = row3.insertCell(1);
+                cell4.innerHTML = "Note:";
+                cell5.innerHTML = notes[i].note;
+
+
+            }
+            else {
+                let row1 = gradeTable.insertRow(0);
+                let cell1 = row1.insertCell(0);
+                cell1.innerHTML = "No grade or presentation submitted for request yet";
+            }
+
+
+
+        }
+
+
+
+        function makeRequestStatusReadable(statusthing){
+			if(statusthing == "PSVA"){
+				return "Pending Supervisor Approval";
+			}
+			if(statusthing == "PDHA"){
+				return "Pending Department Head Approval";
+			}
+			if(statusthing == "PBCA"){
+				return "Pending Ben Co Approval";
+			}
+			if(statusthing == "PEFB"){
+				return "Pending Employee FeedBack";
+			}
+			if(statusthing == "APG"){
+				return "pre-Approved, pending grading";
+			}
+			if(statusthing == "APGC"){
+				return "pre-Approved, pending grade confirmation";
+			}
+			if(statusthing == "Approved"){
+				return "Aprroved and Rewarded";
+			}
+			if(statusthing == "Denied"){
+				return "Request Denied";
+			}
+			else{
+				return "";
+			}
+        }
+
+        function wasGradeReviewed(){
+            if(typeof(submittedGrade[0].reviewedAt) == "null" || typeof(submittedGrade[0].reviewedAt) == "undefined")
+                return false;
+        }
+        
+        function makeEventTypeReadable(eventType){
+			if(eventType == "UC"){
+				return "University Course";
+			}
+			if(eventType == "S"){
+				return "Seminar";
+			}
+			if(eventType == "C"){
+				return "Certification";
+			}
+			if(eventType == "CPC"){
+				return "Certification Prep Course";
+			}
+			if(eventType == "TT"){
+				return "Technical Training";
+			}
+			if(eventType == "O"){
+				return "Other";
+			}
+			return "";
+        }
+        
+        function trueYesFalseNo(someboolean){
+            if(someboolean){
+                return "Yes";
+            }
+            else {
+                return "No";
+            }
+        }
+
+
+
+
+
+
+
+
+    </script>
+</body>
+    <script>
+        function logOut() {
+		    window.location.replace("http://localhost:8080/dev.reese.project1/LoginPage.goto");
+	    }
+
+
+    </script>
+
+</html>

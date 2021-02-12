@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="ISO-8859-1">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+        <title>Message Viewer</title>
+    </head>
+<body>
+    <div class="container">
+		<div class="row align-items-start">
+		  <div class="col">
+			<h1>CompanyName</h1>
+		  </div>
+		  <div class="col">
+			<h1>Request Viewer</h1>
+		  </div>
+		  <div class="col">
+			<h4 id="employeeName">Hello! </h4>
+			<button type="button" class="btn btn-secondary btn-sm" id="loginbtn" onclick="logOut()">Logout</button>
+		  </div>
+		</div>
+    </div>
+
+    <div class="container" id="breadCumbHeadDiv">
+		<div class="col"> </div>
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item"><a href="http://localhost:8080/dev.reese.project1/TRMSHub.goto">TRMS Hub</a></li>
+            <li class="breadcrumb-item"><a href="http://localhost:8080/dev.reese.project1/Messages.goto">Messages</a></li>
+			<li class="breadcrumb-item active" aria-current="page">Message Viewer</li>
+			</ol>
+		</nav>
+    </div>
+
+    <div class="p-4 mb-3 bg-secondary text-white"> </div>
+	<div class="container" id="Body">
+        <div class="col"> </div>
+        <div class="p-3 mb-2 bg-dark text-white">
+			<h6 id="messageTableHeader"></h6>
+			<table class="table table-dark table-hover" id="messageTable">
+                
+      </table>
+      <h5 id="requesttableHeader">Request This Message Is in Reguards to:</h5>
+      <h6 id="requestNumberSpot"></h6>
+			<table class="table table-dark table-hover" id="requestTable">
+                <tr>
+					<th>Status of Request</th>
+					<td id="requestStatus"></td>
+                </tr>
+                <tr>
+					<th>Type Of Event</th>
+					<td id="eventType"></td>
+                </tr>
+                <tr>
+					<th>Total Cost</th>
+					<td id="totalCost"></td>
+                </tr>
+                <tr>
+					<th>Description</th>
+					<td id="description"></td>
+                </tr>
+                <tr>
+					<th>Location</th>
+					<td id="location"></td>
+                </tr>
+                <tr>
+					<th>Start Of Event</th>
+					<td id="start"></td>
+                </tr>
+
+                <tr>
+					<th>Work Justificaiton</th>
+					<td id="justification"></td>
+                </tr>
+                <tr>
+					<th>Grade Format</th>
+					<td id="gradeFormat"></td>
+                </tr>
+                <tr>
+					<th>Required Score</th>
+					<td id="requiredScore"></td>
+                </tr>
+                <tr>
+					<th>Hours of Work that will be Missed</th>
+					<td id="hoursOfWorkMissed"></td>
+                </tr>
+                <tr>
+					<th>Request Submitted At</th>
+					<td id="submittedAt"></td>
+                </tr>
+                <tr>
+					<th>Supervisor Approvals</th>
+					<td id="SVApproval"></td>
+                </tr>
+                <tr>
+					<th>Department Head Approves</th>
+					<td id="DHApproval"></td>
+                </tr>
+                <tr>
+					<th>Benifits Coordinator Approval:</th>
+					<td id="BCA"></td>
+                </tr>
+                
+            </table>
+            <h6 id="notesTableHeader">Notes:</h6>
+            <table class="table table-dark table-hover" id="noteTable">
+                
+            </table>
+
+            <h6 id="GradeTableHeader">Grade:</h6>
+                <table class="table table-dark table-hover" id="gradeTable">
+                    
+                </table>
+
+
+
+
+
+
+
+
+        </div>
+
+
+
+    </div>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+	<script>
+        var pageInfosource;
+        var isBenCoApproval;
+        var employee;
+        var message;
+        var request;
+        var notes;
+        var gradeAndNotes;
+        var otherEmployee;
+        var payouts;
+        var totalThisYear;
+        var stringToRedirectMaybe;
+        var amountPayoutWillBe;
+        getWhereToGetPageInfo();
+
+
+		function getWhereToGetPageInfo(){
+			let xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+				if(this.readyState == 4 && this.status == 200) {
+          console.log(this.responseText);
+          pageInfosource = this.responseText;
+          getPageInfo();
+				}
+			}
+			xhttp.open("GET", "http://localhost:8080/dev.reese.project1/MessageViewer.pageinfo", true);
+			xhttp.setRequestHeader('Content-Type','application/json');
+			xhttp.send();
+    }
+    
+    function getPageInfo(){
+        let xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+          if(this.readyState == 4 && this.status == 200) {
+            console.log(this.responseText);
+            let tempjson = JSON.parse(this.responseText);
+            console.log(tempjson);
+            employee = tempjson[0];
+            message = tempjson[1];
+            request = tempjson[2];
+            notes = tempjson[3];
+            otherEmployee = tempjson[4];
+            isBenCoApproval = (pageInfosource == "/dev.reese.project1/BenCoApprovalMessageViewer.pageinfo")
+            if(message.typeOfMessage == "GCR"){
+              gradeAndNotes = tempjson[5];
+            }
+            if(isBenCoApproval){
+              payouts = tempjson[5];
+              totalThisYear[6];
+            }
+            setUpPage();
+          }
+        }
+        xhttp.open("GET", "http://localhost:8080"+pageInfosource, true);
+        xhttp.setRequestHeader('Content-Type','application/json');
+        xhttp.send();
+    }
+
+
+    function setUpPage(){
+			let asdf = document.getElementById("employeeName");
+			asdf.innerHTML = "Hello " + employee.firstName;
+            addRequestInfoToRequestTable();
+            addNotesToNoteTable();
+            addInfoToMessageTable();
+            
+            
+            
+            if(!(typeof(gradeAndNotes) == "undefined")){
+              addGradeToGradeTable();
+            }
+              
+    }
+
+
+
+        function addInfoToMessageTable(){
+          //.insertRow(rowCount);
+          //messageTable insertRow
+          let rowCount = 0;
+          let messageTable = document.getElementById("messageTable");
+          let row = messageTable.insertRow(rowCount);
+          rowCount = rowCount + 1;
+          let cell0 = row.insertCell(0);
+          let cell1 = row.insertCell(1);
+          let cell2 = row.insertCell(2);
+          let cell3 = row.insertCell(3);
+          cell0.innerHTML = "Message#: " +message.id;
+          cell1.innerHTML = "From: " +makeSenderReadable(message.senderId);
+          cell2.innerHTML = "Regarding Request# " +message.requestId;
+          cell3.innterHTML = "sent at: " + message.createdAt;
+          row = messageTable.insertRow(rowCount);
+          rowCount = rowCount + 1;
+          cell0 = row.insertCell(0);
+          cell1 = row.insertCell(1);
+          cell0.innerHTML = "Type of Message " + makeMessageTypeReadable(message.typeOfMessage);
+          cell1.innerHTML =  GetMessageTypeInstructions(message.typeOfMessage);
+          row = messageTable.insertRow(rowCount);
+          rowCount = rowCount + 1;
+          cell0 = row.insertCell(0);
+          cell1 = row.insertCell(1);
+          cell0.innerHTML = "Sender Message:";
+          cell1.innerHTML =  message.senderNotes;
+          addSubmittionPart();
+        }
+
+
+        function addSubmittionPart(){
+          let stringOfType = message.typeOfMessage;
+          if(stringOfType == "FR"){
+				    addFeedBackRequestInput();
+          }
+          if(stringOfType == "FRR"){
+            addOnlyConfirmInput();
+          }
+          if(stringOfType == "AR"){
+            addApprovalFeedBack();
+          }
+          if(stringOfType == "PAN"){
+            addOnlyConfirmInput();
+          }
+          if(stringOfType == "GSR"){
+            addGSFeedBack();
+          }
+          if(stringOfType == "GCR"){
+            return "Grade Confirmation Reqeust";
+          }	
+          if(stringOfType == "RDN"){
+            addOnlyConfirmInput();
+          }
+          if(stringOfType == "RAN"){
+            addOnlyConfirmInput();
+          }
+        }
+
+
+        function addGSFeedBack(){
+          let messageTable = document.getElementById("messageTable");
+          rowCount = 3;
+          let row = messageTable.insertRow(rowCount);
+          rowCount = rowCount + 1;
+          let cell0 = row.insertCell(0);
+          cell0.innerHTML = "Add grade score then hit green button ";
+          let cell1 = row.insertCell(1);
+          let cell2 = row.insertCell(2);
+          let cell3 = row.insertCell(3);
+         
+          let approveButton = document.createElement("button");
+
+          approveButton.innterHTML = "Submit";
+          
+
+          approveButton.className = "btn btn-success";
+          
+
+          approveButton.onclick = function()  { submitGrade(); }; ////////////////////////////
+          
+
+          cell1.innterHTML = "Approve:";
+          
+          row.appendChild(approveButton);
+          cell1.appendChild(approveButton);
+          
+
+
+         row = messageTable.insertRow(rowCount);
+         rowCount = rowCount + 1;
+         
+         cell0 = row.insertCell(0);
+         cell1 = row.insertCell(1);
+         cell0.innterHTML = "Score you got :";
+         let numberInput = document.createElement("input");
+         numInput.type = "number";
+         numInput.min = "0.00";
+         numInput.step = "0.01";
+         numInput.value = getAmountAdjustedForLimit();
+         numInput.id = "payoutAmount";
+         cell1.appendChild(numberInput);
+         row = messageTable.insertRow(rowCount);
+         rowCount = rowCount + 1;
+         cell0 = row.insertCell(0);
+         cell1 = row.insertCell(1);
+         cell0.innterHTML = "gradeNote Subject :";
+         let newTarea = document.createElement("textarea");
+         newTarea.rows=2;
+         newTarea.id = "subjectBox";
+         cell1.appendChild(newTarea);
+         row = messageTable.insertRow(rowCount);
+         rowCount = rowCount + 1;
+         cell0 = row.insertCell(0);
+         cell1 = row.insertCell(1);
+         cell0.innterHTML = "grade note body :";
+         newTarea = document.createElement("textarea");
+         newTarea.rows=2;
+         newTarea.id = "noteBody";
+         cell1.appendChild(newTarea);
+
+        }
+
+        function submitGrade(){
+          // payoutAmount
+          let subjectbox = document.getElementById("subjectBox");
+          let bodyTexBox = document.getElementById("noteBody");
+          let pa = document.getElementById("payoutAmount");
+          if(pa.value == 0.00 || subjectBox.value == "" || noteBody.value == ""){
+            return;
+          }
+          dataToSend = {requestId:request.id, reportedScore:pa.value, noteSubject:subjectBox.value, note:noteBody.value};
+          let dataToSend = {messageId:message.id, messageResponse:"A", payoutAmount:pa.value, payoutNote:tb.value};
+          let xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function() {
+          if(this.readyState == 4 && this.status == 200) {
+            if(this.responseText == "SS");
+            window.location.replace("http://localhost:8080/dev.reese.project1/Messages.goto");
+          }
+        }
+          xhttp.open("POST", "http://localhost:8080/dev.reese.project1/ReplyToGSRequest.do", true);
+          xhttp.setRequestHeader('Content-Type','application/json');
+          xhttp.send(JSON.stringify(dataToSend));
+        }
+
+
+        function addApprovalFeedBack(){
+          if(isBenCoApproval){
+            console.log("its a BC approval now");
+            console.log(totalThisYear);
+            addBCApprovalInputs();
+          }
+          else {
+            addNonBCApprovalInput();
+          }
+          
+        }
+
+
+        function addBCApprovalInputs(){
+          let messageTable = document.getElementById("messageTable");
+          rowCount = 3;
+          let row = messageTable.insertRow(rowCount);
+          rowCount = rowCount + 1;
+          let cell0 = row.insertCell(0);
+          let cell1 = row.insertCell(1);
+          let cell2 = row.insertCell(2);
+
+          let approveButton = document.createElement("button");
+          let denyButton = document.createElement("button");
+          let RequestFbButton = document.createElement("button");
+
+          approveButton.innterHTML = "Approve";
+          denyButton.innterHTML = "Deny";
+          RequestFbButton.innterHTML = "Request FeedBack";
+
+          approveButton.className = "btn btn-success";
+          denyButton.className = "btn btn-danger";
+          RequestFbButton.className = "btn btn-info";
+
+          approveButton.onclick = function()  { sendBCApproval(); };
+          denyButton.onclick = function()  { sendDenial(); };
+          RequestFbButton.onclick = function()  { sendRequestForFeedBack(); };
+
+          cell0.appendChild(approveButton);
+          cell1.appendChild(denyButton);
+          cell2.appendChild(RequestFbButton);
+
+          row = messageTable.insertRow(rowCount);
+          rowCount = rowCount + 1;
+          cell0 = row.insertCell(0);
+          cell1 = row.insertCell(1);
+          cell0.innerHTML = "Feedback message Or Explaination of Denial";
+         
+         let newTarea = document.createElement("textarea");
+         newTarea.rows=4;
+         newTarea.id = "feedBackBox"
+         cell1.appendChild(newTArea);
+         
+
+
+        //  row = messageTable.insertRow(rowCount);
+        //   rowCount = rowCount + 1;
+        //   cell0 = row.insertCell(0);
+        //   cell1 = row.insertCell(1);
+        //   cell2 = row.insertCell(2);
+         
+        //  cell0.innerHTML = "Total Amount of payouts the employee had for the year : $" + totalThisYear;
+        //  cell1.innerHTML = "Typical Amount for this kind of request : $" + getProjectedNormalAmount();
+        //  cell2.innterHTML = "Amount Ajusted for limit : $" + getAmountAdjustedForLimit();
+        
+         row = messageTable.insertRow(rowCount);
+         rowCount = rowCount + 1;
+         cell0 = row.insertCell(0);
+         let numberInput = document.createElement("input");
+         numInput.type = "number";
+         numInput.min = "0.00";
+         numInput.step = "0.01";
+         numInput.value = getAmountAdjustedForLimit();
+         numInput.id = "payoutAmount";
+         cell1.appendChild(numberInput);
+        //  <input type="number" min="0.00" max="10000.00" step="0.01" value="0.00" id="tcost"/>
+
+        }
+
+        function getAmountAdjustedForLimit(){
+          let pa = getProjectedNormalAmount();
+          let tty = totalThisYear;
+          let newSum = pa+tty;
+          if(pa+tty <= 1000.00){
+            return pa;
+          }
+          else {
+            return(pa - (newSum-1000.00));
+          }
+
+
+        }
+
+        function getProjectedNormalAmount(){
+          let et = request.eventType;
+          let tc = request.totalCost;
+          if(et == "UC"){
+            return .80*tc;
+          }
+          if(et == "S"){
+            return .80*tc;
+          }
+          if(et == "C"){
+            return .80*tc;
+          }
+          if(et == "CPC"){
+            return .80*tc;
+          }
+          if(et == "TT"){
+            return .80*tc;
+          }
+          if(et == "O"){
+            return .80*tc;
+          }
+          return 0.00;
+            
+
+          /*
+          if(eventType.equals("UC")) {
+			return .80*trr.getTotalCost();
+		}
+		if(eventType.equals("S")) {
+			return .60*trr.getTotalCost();
+		}
+		if(eventType.equals("C")) {
+			return trr.getTotalCost();
+		}
+		if(eventType.equals("CPC")) {
+			return .75*trr.getTotalCost();
+		}
+		if(eventType.equals("TT")) {
+			return .90*trr.getTotalCost();
+		}
+		if(eventType.equals("O")) {
+			return .30*trr.getTotalCost();
+		}
+		return 0.00;
+          */
+
+
+
+        }
+
+
+
+
+
+        function addNonBCApprovalInput(){
+          let messageTable = document.getElementById("messageTable");
+          rowCount = 3;
+          let row = messageTable.insertRow(rowCount);
+          rowCount = rowCount + 1;
+          let cell0 = row.insertCell(0);
+          cell0.innerHTML = "Feedback message Or Explaination of Denial";
+          let cell1 = row.insertCell(1);
+          let cell2 = row.insertCell(2);
+          let cell3 = row.insertCell(3);
+         
+          let approveButton = document.createElement("button");
+          let denyButton = document.createElement("button");
+          let RequestFbButton = document.createElement("button");
+
+          approveButton.innterHTML = "Approve";
+          denyButton.innterHTML = "Deny";
+          RequestFbButton.innterHTML = "Request FeedBack";
+
+          approveButton.className = "btn btn-success";
+          denyButton.className = "btn btn-danger";
+          RequestFbButton.className = "btn btn-info";
+
+          approveButton.onclick = function()  { sendNonBCApproval(); };
+          denyButton.onclick = function()  { sendDenial(); };
+          RequestFbButton.onclick = function()  { sendRequestForFeedBack(); };
+
+          cell1.innterHTML = "Approve:";
+          cell2.innterHTML = "Deny: ";
+          cell3.innterHTML = "Request FeedBack:";
+          row.appendChild(approveButton);
+          cell1.appendChild(approveButton);
+          cell2.appendChild(denyButton);
+          cell3.appendChild(RequestFbButton);
+
+
+         row = messageTable.insertRow(rowCount);
+         rowCount = rowCount + 1;
+         let newTarea = document.createElement("textarea");
+         newTarea.rows=4;
+         newTarea.id = "feedBackBox"
+         cell0 = row.insertCell(0);
+         cell1 = row.insertCell(1);
+         cell1.appendChild(newTarea);
+         cell0.innerHTML = "Reason For Denial or What do you want feedback on?";
+        }
+
+
+
+        function addOnlyConfirmInput(){
+          let messageTable = document.getElementById("messageTable");
+          rowCount = 3;
+          let row = messageTable.insertRow(rowCount);
+          rowCount = rowCount + 1;
+          let cell0 = row.insertCell(0);
+          let cell1 = row.insertCell(1);
+          cell0.innerHTML = "Click The Button on the right to Confirm you recieved this message ->";
+         let newButton = document.createElement("button");
+         newButton.innterHTML = "Confirm";
+          newButton.onclick = function() {}
+         newButton.onclick = function()  { ConfirmNotice(); };
+         newButton.className = "btn btn-success";
+         cell1.appendChild(newButton);
+        }
+
+        function addFeedBackRequestInput(){
+          let messageTable = document.getElementById("messageTable");
+          rowCount = 3;
+          let row = messageTable.insertRow(rowCount);
+          rowCount = rowCount + 1;
+          let cell0 = row.insertCell(0);
+          let cell1 = row.insertCell(1);
+          cell0.innerHTML = "Enter FeedBack:";
+          let newTarea = document.createElement("textarea");
+         newTarea.rows=4;
+         newTarea.id = "feedBackBox";
+         cell1.appendChild(newTarea);
+         row = messageTable.insertRow(rowCount);
+         rowCount = rowCount + 1;
+         cell0 = row.insertCell(0);///////////////////////////////////
+         cell0.innterHTML = "Press green button to send feedback ->";
+         cell1 = row.insertCell(1);
+         let newButton = document.createElement("button");
+         newButton.className = "btn btn-success";
+         newButton.innterHTML = "SendFeedBack";
+         newButton.onclick = function()  { feedBackReply(); };
+         cell1.appendChild(newButton);
+        }
+
+
+        function sendBCApproval(){
+          // payoutAmount
+          let tb = document.getElementById("feedBackBox");
+          let pa = document.getElementById("payoutAmount");
+          if(pa.value == 0.00){
+            return;
+          }
+          let dataToSend = {messageId:message.id, messageResponse:"A", payoutAmount:request.totalCost, payoutNote:"payoutnote"};
+          let xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function() {
+          if(this.readyState == 4 && this.status == 200) {
+            if(this.responseText == "SS");
+            window.location.replace("http://localhost:8080/dev.reese.project1/Messages.goto");
+          }
+        }
+        xhttp.open("POST", "http://localhost:8080/dev.reese.project1/ReplyToApprovalRequest.do", true);
+        xhttp.setRequestHeader('Content-Type','application/json');
+        xhttp.send(JSON.stringify(dataToSend));
+        }
+
+
+
+        function sendNonBCApproval(){
+          let dataToSend = {messageId:message.id, messageResponse:"A"};
+          let xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function() {
+          if(this.readyState == 4 && this.status == 200) {
+            if(this.responseText == "SS");
+            window.location.replace("http://localhost:8080/dev.reese.project1/Messages.goto");
+          }
+        }
+        xhttp.open("POST", "http://localhost:8080/dev.reese.project1/ReplyToApprovalRequest.do", true);
+        xhttp.setRequestHeader('Content-Type','application/json');
+        xhttp.send(JSON.stringify(dataToSend));
+        }
+
+        function sendDenial(){
+          let tb = document.getElementById("feedBackBox");
+          console.log("tb value: " +tb.value);
+          if(tb.value == ""){
+            alert("Must give a reason for denial");
+            return;
+          }
+          let dataToSend = {messageId:message.id, reason:tb.value, messageResponse:"D"};
+          let xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function() {
+          if(this.readyState == 4 && this.status == 200) {
+            if(this.responseText == "SS");
+            window.location.replace("http://localhost:8080/dev.reese.project1/Messages.goto");
+          }
+        }
+        xhttp.open("POST", "http://localhost:8080/dev.reese.project1/ReplyToApprovalRequest.do", true);
+        xhttp.setRequestHeader('Content-Type','application/json');
+        xhttp.send(JSON.stringify(dataToSend));
+        }
+
+        function sendRequestForFeedBack(){
+          let tb = document.getElementById("feedBackBox");
+          if(tb.value == ""){
+            alert("FeedBack message body must be filled");
+            return;
+          }
+          console.log("tb value: " +tb.value);
+          let dataToSend = {messageId:message.id, messageResponse:"RF", sendTo:"E", fbMessageBody:tb.value};
+          let xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function() {
+          if(this.readyState == 4 && this.status == 200) {
+            if(this.responseText == "SS");
+            window.location.replace("http://localhost:8080/dev.reese.project1/Messages.goto");
+          }
+        }
+        xhttp.open("POST", "http://localhost:8080/dev.reese.project1/ReplyToApprovalRequest.do", true);
+        xhttp.setRequestHeader('Content-Type','application/json');
+        xhttp.send(JSON.stringify(dataToSend));
+        }
+
+        //
+
+
+        function ConfirmNotice(){
+        let dataToSend = {messageId:message.id};
+        let xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+          if(this.readyState == 4 && this.status == 200) {
+            if(this.responseText == "SS");
+            window.location.replace("http://localhost:8080/dev.reese.project1/Messages.goto");
+          }
+        }
+        xhttp.open("POST", "http://localhost:8080/dev.reese.project1/ReplyToNotice.do", true);
+        xhttp.setRequestHeader('Content-Type','application/json');
+        xhttp.send(JSON.stringify(dataToSend));
+    }
+
+    function feedBackReply(){
+        let tb = document.getElementById("feedBackBox");
+        console.log("tb value: " +tb.value);
+        let dataToSend = {messageId:message.id, bodyOfMessage:tb.value};
+        let xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+          if(this.readyState == 4 && this.status == 200) {
+            if(this.responseText == "SS");
+            window.location.replace("http://localhost:8080/dev.reese.project1/Messages.goto");
+          }
+        }
+        xhttp.open("POST", "http://localhost:8080/dev.reese.project1/ReplyToFBRequest.do", true);
+        xhttp.setRequestHeader('Content-Type','application/json');
+        xhttp.send(JSON.stringify(dataToSend));
+    }
+
+
+
+        function makeSenderReadable(employeeid){
+          if(message.senderId == -1 || message.senderId == 0 || typeof(employeeid) == "undefined"){
+            return "System Automated Message";
+          }
+          else{
+            return otherEmployee.firstName + " " + otherEmployee.lastName;
+          }
+          return " ";
+        }
+
+      function makeMessageTypeReadable(stringOfType){
+			if(stringOfType == "FR"){
+				return "FeedBack Request";
+			}
+			if(stringOfType == "FRR"){
+				return "FeedBack Request Response";
+			}
+			if(stringOfType == "AR"){
+				return "Approval Request";
+			}
+			if(stringOfType == "PAN"){
+				return "PreApproval Notice";
+			}
+			if(stringOfType == "GSR"){
+				return "Grade Submittion Request";
+			}
+			if(stringOfType == "GCR"){
+				return "Grade Confirmation Reqeust";
+			}	
+			if(stringOfType == "RDN"){
+				return "Request Denied Notice";
+			}
+			if(stringOfType == "RAN"){
+				return "Request Awarded Notice";
+			}
+			else {
+				return "";
+			}
+			
+    }
+    
+
+
+    function GetMessageTypeInstructions(stringOfType){
+			if(stringOfType == "FR"){
+				return "The Sender has requested feedback reguarding this request. Please read their Messsage and response below";
+			}
+			if(stringOfType == "FRR"){
+				return "The Sender has replied to your feedback request. Please confirm you have recieved it below";
+			}
+			if(stringOfType == "AR"){
+				return "Approval is needed for this request to move forward";
+			}
+			if(stringOfType == "PAN"){
+				return "This is just a notice that your request has been preapproved. Just confirm you got this message";
+			}
+			if(stringOfType == "GSR"){
+				return "Please submit the grade in the form below";
+			}
+			if(stringOfType == "GCR"){
+				return "Please confirm the employee has met the require standards to be awarded this request.";
+			}	
+			if(stringOfType == "RDN"){
+				return "This is a notice that your request was denied. Please confirm that you have recieved it.";
+			}
+			if(stringOfType == "RAN"){
+				return "This is a notice that your request was awarded. Please confirm that you have recieved it";
+			}
+			else {
+				return "";
+			}
+			
+		}
+        
+        function addRequestInfoToRequestTable(){
+            let cr = document.getElementById("requestNumberSpot");
+            cr.innerHTML = "Request # "+ request.id;
+            cr = document.getElementById("requestStatus");
+            cr.innerHTML = makeRequestStatusReadable(request.statusOfRequest);
+
+            cr = document.getElementById("eventType");
+            cr.innerHTML = makeEventTypeReadable(request.eventType);
+
+            cr = document.getElementById("totalCost");
+            cr.innerHTML = "$"+request.totalCost;
+
+            cr = document.getElementById("description");
+            cr.innerHTML = request.eventDescription;
+
+            cr = document.getElementById("location");
+            cr.innerHTML = request.eventLocation;
+
+            cr = document.getElementById("start");
+            cr.innerHTML = request.startDateTimeOfEvent;
+
+            cr = document.getElementById("justification");
+            cr.innerHTML = request.workRelatedJustification;
+            cr = document.getElementById("gradeFormat");
+            let gfvalue = request.gradeFormat;
+            if(gfvalue == 0) {
+                cr.innerHTML = "Test Score out of 100%";
+                cr = document.getElementById("requiredScore");
+                cr.innerHTML = request.scoreRequired + "%";
+            }
+            if(gfvalue == 1){
+                cr.innerHTML = "pass/fail result";
+                cr = document.getElementById("requiredScore");
+                cr.innerHTML = "A Pass";
+            }
+            if(gfvalue == 2){
+                cr.innerHTML = "A presentation";
+                cr = document.getElementById("requiredScore");
+                cr.innerHTML = "A satisfactory presentation as determined by your supervisor";
+            }
+            cr = document.getElementById("hoursOfWorkMissed");
+            cr.innerHTML = request.hoursOfWorkMissed;
+            cr = document.getElementById("submittedAt");
+            cr.innerHTML = request.dateSubmitted;
+            cr = document.getElementById("SVApproval");
+            cr.innerHTML = trueYesFalseNo(request.hasSupervisorApproval);
+            cr = document.getElementById("DHApproval");
+            cr.innerHTML = trueYesFalseNo(request.hasDepartmentHeadApproval);
+            cr = document.getElementById("BCA");
+            cr.innerHTML = trueYesFalseNo(request.hasBenCoApproval);
+        }
+
+        function addNotesToNoteTable(){
+            console.log("inside of adding notes");
+            let rowCount = 0;
+            let noteTable = document.getElementById("noteTable");
+            if(!(notes.length == 0)){
+                console.log("inside the condition to check if !notes == [] its ");
+                for (i = 0; i < notes.length; i++) {
+                    console.log("at the start of teh for loop");
+                    let row1 = noteTable.insertRow(rowCount);
+                    rowCount = rowCount + 1;
+                    let cell1 = row1.insertCell(0);
+                    let cell2 = row1.insertCell(1);
+                    cell1.innerHTML = "Note added by: "+ notes[i].posterName;
+                    cell2.innerHTML = "Added at: " + notes[i].addedAt;
+                    let row2 = noteTable.insertRow(rowCount);
+                    rowCount = rowCount + 1;
+                    let cell3 = row2.insertCell(0);
+                    cell3.innerHTML = "Subject: " + notes[i].subject;
+                    let row3 = noteTable.insertRow(rowCount);
+                    rowCount = rowCount + 1;
+                    let cell4 = row3.insertCell(0);
+                    let cell5 = row3.insertCell(1);
+                    cell4.innerHTML = "Note:";
+                    cell5.innerHTML = notes[i].note;
+			           }
+            }
+            else {
+                console.log("make it to the else of the add notes to table");
+                let row = noteTable.insertRow(rowCount);
+                let cell1 = row.insertCell(0);
+                cell1.innerHTML = "No notes attached to request";
+            }
+            //do add note to if wanted here
+            console.log("end of add notes method");
+        }
+
+        function addGradeToGradeTable(){
+            console.log("start of add grades to table");
+            let rowCount = 0;
+            let gradeTable = document.getElementById("gradeTable");
+            if(!(submittedGrade.length == 0)){
+                console.log("inside of the submittedgaade == [] thing wow much wow");
+                let row1 = gradeTable.insertRow(rowCount);
+                rowCount = rowCount + 1;
+                let cell1 = row1.insertCell(0);
+                let cell2 = row1.insertCell(1);
+                cell1.innerHTML = "Reported Score: ";
+                cell2.innerHTML = submittedGrade[0].employeeSelfReportedScore;
+                row1 = gradeTable.insertRow(rowCount);
+                rowCount = rowCount + 1;
+                cell1 = row1.insertCell(0);
+                cell2 = row1.insertCell(1);
+                cell1.innerHTML = "Submitted At: ";
+                cell2.innerHTML = submittedGrade[0].submittedAt;
+                row1 = gradeTable.insertRow(rowCount);
+                rowCount = rowCount + 1;
+                cell1 = row1.insertCell(0);
+                cell2 = row1.insertCell(1);
+                let reviewed = wasGradeReviewed();
+                cell1.innerHTML = "Reviewed yet: ";
+                if(reviewed){
+                    cell2.innerHTML = "Yes";
+                    row1 = gradeTable.insertRow(rowCount);
+                    rowCount = rowCount + 1;
+                    cell1 = row1.insertCell(0);
+                    cell2 = row1.insertCell(1);
+                    cell1.innerHTML = "Reviewed At: ";
+                    cell2.innerHTML = submittedGrade[0].reviewedAt;
+                    row1 = gradeTable.insertRow(rowCount);
+                    rowCount = rowCount + 1;
+                    cell1 = row1.insertCell(0);
+                    cell2 = row1.insertCell(1);
+                    cell1.innerHTML = "passed: ";
+                    cell2.innerHTML = trueYesFalseNo(submittedGrade[0].passed);
+                }
+                else {
+                    cell2.innerHTML = "No";
+                }
+                if(submittedGrade[1] === []){
+                    row1 = gradeTable.insertRow(rowCount);
+                    let cell1 = row.insertCell(0);
+                    cell1.innerHTML = "No notes attached to Grade";
+                }
+                else{
+                    row1 = gradeTable.insertRow(rowCount);
+                    rowCount = rowCount + 1;
+                    cell1 = row1.insertCell(0);
+                    cell1.innerHTML = "Notes attached to grade: ";
+                    for (i = 0; i < notes.length; i++) {
+                        row1 = gradeTable.insertRow(rowCount);
+                        rowCount = rowCount + 1;
+                        cell1 = row1.insertCell(0);
+                        cell1.innerHTML = "Note added At: "+ submittedGrade[1][i].addedAt;
+                        row1 = gradeTable.insertRow(rowCount);
+                        rowCount = rowCount + 1;
+                        cell1 = row1.insertCell(0);
+                        cell1.innerHTML = "Subject: " + submittedGrade[1][i].subject;
+                        row1 = gradeTable.insertRow(rowCount);
+                        rowCount = rowCount + 1;
+                        cell1 = row1.insertCell(0);
+                        cell2 = row1.insertCell(1);
+                        cell1.innerHTML = "Note:";
+                        cell2.innerHTML = submittedGrade[1][i].note;
+                    }
+                    //where to add add note if wanted. 
+                }
+
+
+                /////////////////////////////
+                
+                
+                
+                let row2 = gradeTable.insertRow(rowCount);
+                rowCount = rowCount + 1;
+                let cell3 = row2.insertCell(0);
+                cell3.innerHTML = "Subject: " + notes[i].subject;
+                let row3 = gradeTable.insertRow(rowCount);
+                rowCount = rowCount + 1;
+                let cell4 = row3.insertCell(0);
+                let cell5 = row3.insertCell(1);
+                cell4.innerHTML = "Note:";
+                cell5.innerHTML = notes[i].note;
+
+
+            }
+            else {
+                let row1 = gradeTable.insertRow(0);
+                let cell1 = row1.insertCell(0);
+                cell1.innerHTML = "No grade or presentation submitted for request yet";
+            }
+
+
+
+        }
+
+        function makeRequestStatusReadable(statusthing){
+			if(statusthing == "PSVA"){
+				return "Pending Supervisor Approval";
+			}
+			if(statusthing == "PDHA"){
+				return "Pending Department Head Approval";
+			}
+			if(statusthing == "PBCA"){
+				return "Pending Ben Co Approval";
+			}
+			if(statusthing == "PEFB"){
+				return "Pending Employee FeedBack";
+			}
+			if(statusthing == "APG"){
+				return "pre-Approved, pending grading";
+			}
+			if(statusthing == "APGC"){
+				return "pre-Approved, pending grade confirmation";
+			}
+			if(statusthing == "Approved"){
+				return "Aprroved and Rewarded";
+			}
+			if(statusthing == "Denied"){
+				return "Request Denied";
+			}
+			else{
+				return "";
+			}
+        }
+
+        function wasGradeReviewed(){
+            if(typeof(submittedGrade[0].reviewedAt) == "null" || typeof(submittedGrade[0].reviewedAt) == "undefined")
+                return false;
+        }
+        
+        function makeEventTypeReadable(eventType){
+			if(eventType == "UC"){
+				return "University Course";
+			}
+			if(eventType == "S"){
+				return "Seminar";
+			}
+			if(eventType == "C"){
+				return "Certification";
+			}
+			if(eventType == "CPC"){
+				return "Certification Prep Course";
+			}
+			if(eventType == "TT"){
+				return "Technical Training";
+			}
+			if(eventType == "O"){
+				return "Other";
+			}
+			return "";
+        }
+        
+        function trueYesFalseNo(someboolean){
+            if(someboolean){
+                return "Yes";
+            }
+            else {
+                return "No";
+            }
+        }
+
+    
+
+    
+
+
+    </script>
+</body>
+
+<script>
+  function logOut() {
+  window.location.replace("http://localhost:8080/dev.reese.project1/LoginPage.goto");
+}
+
+</script>
+</html>
